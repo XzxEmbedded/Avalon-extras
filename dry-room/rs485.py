@@ -20,18 +20,30 @@ import sys
 def rs485_open():
     global COM_Port
 
-    try:
-        # Opening the serial port
-        COM_PortName = "/dev/ttyUSB0"
-        COM_Port = serial.Serial(COM_PortName, timeout=1)
+    index = 0
 
-        # Set Baud rate, Number of data bits for 8, No parity, Number of Stop bits for 1
-        COM_Port.baudrate = 9600
-        COM_Port.bytesize = 8
-        COM_Port.parity = 'N'
-        COM_Port.stopbits = 1
-    except:
-        return False
+    while True:
+        try:
+            # Opening the serial port
+            usb_port = "/dev/ttyUSB" + str(index)
+            COM_PortName = usb_port
+
+            COM_Port = serial.Serial(COM_PortName, timeout=1)
+
+            # Set Baud rate, Number of data bits for 8, No parity, Number of Stop bits for 1
+            COM_Port.baudrate = 9600
+            COM_Port.bytesize = 8
+            COM_Port.parity = 'N'
+            COM_Port.stopbits = 1
+
+            break
+        except:
+            index = index + 1
+            if index > 100:
+                print("Do not check /dev/ttyUSB")
+                return False
+
+            continue
 
     return True
 
