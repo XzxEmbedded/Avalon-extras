@@ -4,12 +4,20 @@
 #
 # USBTORS485 connect PLC: Custom communication protocol in RPI and PLC
 # protocol: start, function code, datas, end. All 4 bytes.
-# start		    function code			        data0       end
-# 'C'/0x43	    writing big fan: 0		        0/1/2		'N'/0x4E
-#		        reading send wind temp: 1
-#		        reading back wind temp: 2
-#		        reading dry room temp1: 3
-#		        reading dry room temp2: 4
+# Writing:
+# start		function code			data0       	end
+# 'C'/0x43	writing big fan: 0		0/1/2	    	'N'/0x4E
+#		reading send wind temp: 1	random
+#               reading back wind temp: 2	random
+#               reading dry room temp1: 3	random
+#               reading dry room temp2: 4	random
+#
+# Reading:
+# start		function code			data0       	data1		end
+# 'C'/0x43	reading send wind temp: 1	integer		fractional	'N'/0x4E
+#		reading back wind temp: 2	integer		fractional
+#		reading dry room temp1: 3	integer		fractional
+#		reading dry room temp2: 4	integer		fractional
 #
 
 import serial
@@ -86,9 +94,9 @@ def set_fan_speed(level):
     data[2] = level
     rs485_write(data)
     time.sleep(1)
-    tmp = rs485_read(6)
+    tmp = rs485_read(5)
     if tmp:
-        if tmp[1] == '0x43' and tmp[2] == '0x0' and tmp[3] == '0x88' and tmp[4] == '0x4e':
+        if tmp[0] == '0x43' and tmp[1] == '0x0' and tmp[2] == '0x88' and tmp[3] == '0x4e':
             return True
         else:
             return False
@@ -103,10 +111,10 @@ def get_inlet_temp():
     data = [67, 1, 0, 78]
     rs485_write(data)
     time.sleep(1)
-    tmp = rs485_read(6)
+    tmp = rs485_read(5)
     if tmp:
-        if tmp[1] == '0x43' and tmp[2] == '0x1' and tmp[4] == '0x4e':
-            return tmp[3]
+        if tmp[0] == '0x43' and tmp[1] == '0x1' and tmp[4] == '0x4e':
+            return int(tmp[2]) + int(tmp[3]) / 10.0
         else:
             print(tmp)
             return None
@@ -121,10 +129,10 @@ def get_outlet_temp():
     data = [67, 2, 0, 78]
     rs485_write(data)
     time.sleep(1)
-    tmp = rs485_read(6)
+    tmp = rs485_read(5)
     if tmp:
-        if tmp[1] == '0x43' and tmp[2] == '0x2' and tmp[4] == '0x4e':
-            return tmp[3]
+        if tmp[0] == '0x43' and tmp[1] == '0x2' and tmp[4] == '0x4e':
+            return int(tmp[2]) + int(tmp[3]) / 10.0
         else:
             print(tmp)
             return None
@@ -136,10 +144,10 @@ def get_dry_room_temp1():
     data = [67, 3, 0, 78]
     rs485_write(data)
     time.sleep(1)
-    tmp = rs485_read(6)
+    tmp = rs485_read(5)
     if tmp:
-        if tmp[1] == '0x43' and tmp[2] == '0x3' and tmp[4] == '0x4e':
-            return tmp[3]
+        if tmp[0] == '0x43' and tmp[1] == '0x3' and tmp[4] == '0x4e':
+            return int(tmp[2]) + int(tmp[3]) / 10.0
         else:
             print(tmp)
             return None
@@ -151,10 +159,10 @@ def get_dry_room_temp2():
     data = [67, 4, 0, 78]
     rs485_write(data)
     time.sleep(1)
-    tmp = rs485_read(6)
+    tmp = rs485_read(5)
     if tmp:
-        if tmp[1] == '0x43' and tmp[2] == '0x4' and tmp[4] == '0x4e':
-            return tmp[3]
+        if tmp[0] == '0x43' and tmp[1] == '0x4' and tmp[4] == '0x4e':
+            return int(tmp[2]) + int(tmp[3]) / 10.0
         else:
             print(tmp)
             return None
