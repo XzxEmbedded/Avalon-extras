@@ -39,7 +39,7 @@ def rs485_open():
             COM_Port = serial.Serial(COM_PortName, timeout=1)
 
             # Set Baud rate, Number of data bits for 8, No parity, Number of Stop bits for 1
-            COM_Port.baudrate = 9600
+            COM_Port.baudrate = 19200
             COM_Port.bytesize = 8
             COM_Port.parity = 'N'
             COM_Port.stopbits = 1
@@ -82,6 +82,8 @@ def rs485_read(cnt):
 
 # Write RS485 datas
 def rs485_write(data):
+    COM_Port.reset_input_buffer()
+    COM_Port.reset_output_buffer()
     bytes_cnt = COM_Port.write(data)
     print("Write: write count = %d bytes, datas: %s" % (bytes_cnt, data))
 
@@ -96,7 +98,7 @@ def set_fan_speed(level):
     time.sleep(1)
     tmp = rs485_read(5)
     if tmp:
-        if tmp[0] == '0x43' and tmp[1] == '0x0' and tmp[2] == '0x88' and tmp[3] == '0x4e':
+        if tmp[0] == '0x43' and tmp[1] == '0x0' and tmp[2] == ('0x' + str(data[2])) and tmp[3] == '0x88' and tmp[4] == '0x4e':
             return True
         else:
             return False
@@ -114,7 +116,7 @@ def get_inlet_temp():
     tmp = rs485_read(5)
     if tmp:
         if tmp[0] == '0x43' and tmp[1] == '0x1' and tmp[4] == '0x4e':
-            return int(tmp[2]) + int(tmp[3]) / 10.0
+            return int(tmp[2][2:], 16) + int(tmp[3][2:], 16) / 10.0
         else:
             print(tmp)
             return None
@@ -132,7 +134,7 @@ def get_outlet_temp():
     tmp = rs485_read(5)
     if tmp:
         if tmp[0] == '0x43' and tmp[1] == '0x2' and tmp[4] == '0x4e':
-            return int(tmp[2]) + int(tmp[3]) / 10.0
+            return int(tmp[2][2:], 16) + int(tmp[3][2:], 16) / 10.0
         else:
             print(tmp)
             return None
@@ -147,7 +149,7 @@ def get_dry_room_temp1():
     tmp = rs485_read(5)
     if tmp:
         if tmp[0] == '0x43' and tmp[1] == '0x3' and tmp[4] == '0x4e':
-            return int(tmp[2]) + int(tmp[3]) / 10.0
+            return int(tmp[2][2:], 16) + int(tmp[3][2:], 16) / 10.0
         else:
             print(tmp)
             return None
@@ -162,7 +164,7 @@ def get_dry_room_temp2():
     tmp = rs485_read(5)
     if tmp:
         if tmp[0] == '0x43' and tmp[1] == '0x4' and tmp[4] == '0x4e':
-            return int(tmp[2]) + int(tmp[3]) / 10.0
+            return int(tmp[2][2:], 16) + int(tmp[3][2:], 16) / 10.0
         else:
             print(tmp)
             return None
@@ -189,10 +191,14 @@ if __name__ == '__main__':
         print("\033[1;31m\nOpen USB failed\033[0m")
         sys.exit()
 
-    print(set_fan_speed(1))
+    print(set_fan_speed(2))
+    time.sleep(3)
     print(get_inlet_temp())
+    time.sleep(3)
     print(get_outlet_temp())
+    time.sleep(3)
     print(get_dry_room_temp(1))
+    time.sleep(3)
     print(get_dry_room_temp(2))
 
     if not rs485_close():
