@@ -101,6 +101,7 @@ def set_fan_speed(level):
         if tmp[0] == '0x43' and tmp[1] == '0x0' and tmp[2] == ('0x' + str(data[2])) and tmp[3] == '0x88' and tmp[4] == '0x4e':
             return True
         else:
+            print(tmp)
             return False
     else:
         return False
@@ -116,7 +117,10 @@ def get_inlet_temp():
     tmp = rs485_read(5)
     if tmp:
         if tmp[0] == '0x43' and tmp[1] == '0x1' and tmp[4] == '0x4e':
-            return int(tmp[2][2:], 16) + int(tmp[3][2:], 16) / 10.0
+            if int(tmp[2][2:], 16) & 0x80:
+                return ((~int(tmp[2][2:], 16) ^ 0b11111111) + 1) - int(tmp[3][2:], 16) / 10.0
+            else:
+                return int(tmp[2][2:], 16) + int(tmp[3][2:], 16) / 10.0
         else:
             print(tmp)
             return None
@@ -134,7 +138,10 @@ def get_outlet_temp():
     tmp = rs485_read(5)
     if tmp:
         if tmp[0] == '0x43' and tmp[1] == '0x2' and tmp[4] == '0x4e':
-            return int(tmp[2][2:], 16) + int(tmp[3][2:], 16) / 10.0
+            if int(tmp[2][2:], 16) & 0x80:
+                return ((~int(tmp[2][2:], 16) ^ 0b11111111) + 1) - int(tmp[3][2:], 16) / 10.0
+            else:
+                return int(tmp[2][2:], 16) + int(tmp[3][2:], 16) / 10.0
         else:
             print(tmp)
             return None
@@ -149,7 +156,10 @@ def get_dry_room_temp1():
     tmp = rs485_read(5)
     if tmp:
         if tmp[0] == '0x43' and tmp[1] == '0x3' and tmp[4] == '0x4e':
-            return int(tmp[2][2:], 16) + int(tmp[3][2:], 16) / 10.0
+            if int(tmp[2][2:], 16) & 0x80:
+                return ((~int(tmp[2][2:], 16) ^ 0b11111111) + 1) - int(tmp[3][2:], 16) / 10.0
+            else:
+                return int(tmp[2][2:], 16) + int(tmp[3][2:], 16) / 10.0
         else:
             print(tmp)
             return None
@@ -164,7 +174,10 @@ def get_dry_room_temp2():
     tmp = rs485_read(5)
     if tmp:
         if tmp[0] == '0x43' and tmp[1] == '0x4' and tmp[4] == '0x4e':
-            return int(tmp[2][2:], 16) + int(tmp[3][2:], 16) / 10.0
+            if int(tmp[2][2:], 16) & 0x80:
+                return ((~int(tmp[2][2:], 16) ^ 0b11111111) + 1) - int(tmp[3][2:], 16) / 10.0
+            else:
+                return int(tmp[2][2:], 16) + int(tmp[3][2:], 16) / 10.0
         else:
             print(tmp)
             return None
