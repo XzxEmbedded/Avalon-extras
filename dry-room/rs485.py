@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Author March 2019 Zhenxing Xu <xuzhenxing@canaan.creative.com>
 #
