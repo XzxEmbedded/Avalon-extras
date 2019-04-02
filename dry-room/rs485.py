@@ -118,7 +118,7 @@ def get_inlet_temp():
     if tmp:
         if tmp[0] == '0x43' and tmp[1] == '0x1' and tmp[4] == '0x4e':
             if int(tmp[2][2:], 16) & 0x80:
-                return ((~int(tmp[2][2:], 16) ^ 0b11111111) + 1) - int(tmp[3][2:], 16) / 10.0
+                return ((~int(tmp[2][2:], 16) ^ 0b11111111)) - int(tmp[3][2:], 16) / 10.0
             else:
                 return int(tmp[2][2:], 16) + int(tmp[3][2:], 16) / 10.0
         else:
@@ -139,7 +139,7 @@ def get_outlet_temp():
     if tmp:
         if tmp[0] == '0x43' and tmp[1] == '0x2' and tmp[4] == '0x4e':
             if int(tmp[2][2:], 16) & 0x80:
-                return ((~int(tmp[2][2:], 16) ^ 0b11111111) + 1) - int(tmp[3][2:], 16) / 10.0
+                return ((~int(tmp[2][2:], 16) ^ 0b11111111)) - int(tmp[3][2:], 16) / 10.0
             else:
                 return int(tmp[2][2:], 16) + int(tmp[3][2:], 16) / 10.0
         else:
@@ -150,6 +150,8 @@ def get_outlet_temp():
 
 
 def get_dry_room_temp1():
+    print("\033[1;32m\nGet dry room tempuratrue1\033[0m")
+
     data = [67, 3, 0, 78]
     rs485_write(data)
     time.sleep(1)
@@ -157,7 +159,7 @@ def get_dry_room_temp1():
     if tmp:
         if tmp[0] == '0x43' and tmp[1] == '0x3' and tmp[4] == '0x4e':
             if int(tmp[2][2:], 16) & 0x80:
-                return ((~int(tmp[2][2:], 16) ^ 0b11111111) + 1) - int(tmp[3][2:], 16) / 10.0
+                return ((~int(tmp[2][2:], 16) ^ 0b11111111)) - int(tmp[3][2:], 16) / 10.0
             else:
                 return int(tmp[2][2:], 16) + int(tmp[3][2:], 16) / 10.0
         else:
@@ -168,6 +170,8 @@ def get_dry_room_temp1():
 
 
 def get_dry_room_temp2():
+    print("\033[1;32m\nGet dry room tempuratrue2\033[0m")
+
     data = [67, 4, 0, 78]
     rs485_write(data)
     time.sleep(1)
@@ -175,7 +179,7 @@ def get_dry_room_temp2():
     if tmp:
         if tmp[0] == '0x43' and tmp[1] == '0x4' and tmp[4] == '0x4e':
             if int(tmp[2][2:], 16) & 0x80:
-                return ((~int(tmp[2][2:], 16) ^ 0b11111111) + 1) - int(tmp[3][2:], 16) / 10.0
+                return ((~int(tmp[2][2:], 16) ^ 0b11111111)) - int(tmp[3][2:], 16) / 10.0
             else:
                 return int(tmp[2][2:], 16) + int(tmp[3][2:], 16) / 10.0
         else:
@@ -183,20 +187,6 @@ def get_dry_room_temp2():
             return None
     else:
         return None
-
-
-# Get dry room tempurature1
-def get_dry_room_temp(position):
-    if position == 1 or position == 2:
-        print("\033[1;32m\nGet dry room tempuratrue%d\033[0m" % position)
-    else:
-        print("\033[1;31m\nDry room position error\033[0m")
-        sys.exit()
-
-    if position == 1:
-        return get_dry_room_temp1()
-    elif position == 2:
-        return get_dry_room_temp2()
 
 
 if __name__ == '__main__':
@@ -210,9 +200,9 @@ if __name__ == '__main__':
     time.sleep(3)
     print(get_outlet_temp())
     time.sleep(3)
-    print(get_dry_room_temp(1))
+    print(get_dry_room_temp1())
     time.sleep(3)
-    print(get_dry_room_temp(2))
+    print(get_dry_room_temp2())
 
     if not rs485_close():
         print("\033[1;31m\nFailed USB failed\033[0m")
