@@ -3,22 +3,28 @@
 # Author March 2019 Zhenxing Xu <xuzhenxing@canaan.creative.com>
 #
 # USBTORS485 connect PLC: Custom communication protocol in RPI and PLC
-# protocol: start, function code, datas, end. All 4 bytes.
-# Writing:
-# start		function code			data0       	end
-# 'C'/0x43	writing big fan: 0		0/1/2	    	'N'/0x4E
-#           reading send wind temp: 1	random
-#           reading back wind temp: 2	random
-#           reading dry room temp1: 3	random
-#           reading dry room temp2: 4	random
-#		    reading big fan speed:  5   random
-#
-# Reading:
-# start		function code			data0       	data1		end
-# 'C'/0x43	reading send wind temp: 1	integer		fractional	'N'/0x4E
-#		reading back wind temp: 2	integer		fractional
-#		reading dry room temp1: 3	integer		fractional
-#		reading dry room temp2: 4	integer		fractional
+# --------------------------------------------------------------------------
+# RS485 send datas:
+# --------------------------------------------------------------------------
+# - start     -  function code               -    data0     -     end      -
+# --------------------------------------------------------------------------
+# - 'C'/0x43  -  writing big fan: 0          -    0/1/2     -   'N'/0x4E   -
+# -           -  reading send wind temp: 1   -    random    -              -
+# -           -  reading back wind temp: 2   -    random    -              -
+# -           -  reading dry room temp1: 3   -    random    -              -
+# -           -  reading dry room temp2: 4   -    random    -              -
+# -           -  reading big fan speed:  5   -    random    -              -
+# --------------------------------------------------------------------------
+# RS485 receive datas:
+# ----------------------------------------------------------------------------------------------
+# - start     -  function code               -    data0     -    data0          -     end      -
+# ----------------------------------------------------------------------------------------------
+# - 'C'/0x43  -  reading send wind temp: 1   -    integer    -    fractional    -   'N'/0x4E   -
+# -           -  reading back wind temp: 2   -    integer    -    fractional    -              -
+# -           -  reading dry room temp1: 3   -    integer    -    fractional    -              -
+# -           -  reading dry room temp2: 4   -    integer    -    fractional    -              -
+# -           -  reading big fan speed:  5   -    integer    -    0x88          -              -
+# ----------------------------------------------------------------------------------------------
 #
 
 import serial
