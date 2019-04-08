@@ -118,7 +118,7 @@ def get_fan_speed():
     tmp = rs485_read(5)
     if tmp:
         if tmp[0] == '0x43' and tmp[1] == '0x5' and tmp[3] == '0x88' and tmp[4] == '0x4e':
-            return int(tmp[2][2:], 16)
+            return int(tmp[2][2:], 16) if int(tmp[2][2:], 16) >= 0 and int(tmp[2][2:], 16) <= 2 else False
         else:
             print(tmp)
             return False
