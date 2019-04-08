@@ -7,10 +7,11 @@
 # Writing:
 # start		function code			data0       	end
 # 'C'/0x43	writing big fan: 0		0/1/2	    	'N'/0x4E
-#		reading send wind temp: 1	random
-#               reading back wind temp: 2	random
-#               reading dry room temp1: 3	random
-#               reading dry room temp2: 4	random
+#           reading send wind temp: 1	random
+#           reading back wind temp: 2	random
+#           reading dry room temp1: 3	random
+#           reading dry room temp2: 4	random
+#		    reading big fan speed:  5   random
 #
 # Reading:
 # start		function code			data0       	data1		end
@@ -107,6 +108,24 @@ def set_fan_speed(level):
         return False
 
 
+# Getting big fan's speed
+def get_fan_speed():
+    print("\033[1;32m\nGet fan speed\033[0m")
+
+    data = [67, 5, 0, 78]
+    rs485_write(data)
+    time.sleep(1)
+    tmp = rs485_read(5)
+    if tmp:
+        if tmp[0] == '0x43' and tmp[1] == '0x5' and tmp[3] == '0x88' and tmp[4] == '0x4e':
+            return int(tmp[2][2:], 16)
+        else:
+            print(tmp)
+            return False
+    else:
+        return False
+
+
 # Get inlet tempurature
 def get_inlet_temp():
     print("\033[1;32m\nGet inlet tempuratrue\033[0m")
@@ -195,6 +214,8 @@ if __name__ == '__main__':
         sys.exit()
 
     print(set_fan_speed(2))
+    time.sleep(3)
+    print(get_fan_speed())
     time.sleep(3)
     print(get_inlet_temp())
     time.sleep(3)
